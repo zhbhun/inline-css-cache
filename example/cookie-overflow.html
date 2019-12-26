@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Normal</title>
+  <script src="/lib/client.js"></script>
+  <script src="./bootstrap.js"></script>
+  <script>
+    var temp = 'body,html{}';
+
+    function create(count) {
+      var result = [];
+      for (var i = 0; i < count; i++) {
+        var n = '';
+        for (let j = 0; j < 500; j++) {
+          n += i;
+        }
+        result.push({
+          k: n,
+          n: i.toString(),
+          s: temp
+        });
+      }
+      return result;
+    }
+
+    window.inlineCSSCache({
+      csses: create(9),
+      cookieLimit: 4000
+    });
+  </script>
+</head>
+<body>
+  <!-- Standard button -->
+  <button type="button" class="btn btn-default">（默认样式）Default</button>
+
+  <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+  <button type="button" class="btn btn-primary">（首选项）Primary</button>
+
+  <!-- Indicates a successful or positive action -->
+  <button type="button" class="btn btn-success">（成功）Success</button>
+
+  <!-- Contextual button for informational alert messages -->
+  <button type="button" class="btn btn-info">（一般信息）Info</button>
+
+  <!-- Indicates caution should be taken with this action -->
+  <button type="button" class="btn btn-warning">（警告）Warning</button>
+
+  <!-- Indicates a dangerous or potentially negative action -->
+  <button type="button" class="btn btn-danger">（危险）Danger</button>
+
+  <!-- Deemphasize a button by making it look like a link while maintaining button behavior -->
+  <button type="button" class="btn btn-link">（链接）Link</button>
+</body>
+</html>

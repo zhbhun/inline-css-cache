@@ -8,9 +8,13 @@
 /**
  * 服务端下发的 CSS 配置
  *
- * @param {CSSCache[]} csses
+ * @param {Object} options
+ * @param {CSSCache[]} options.csses
+ * @param {number} options.cookieLimit cookie 最大长度限制，默认 4000
  */
-window.inlineCSSCache = function(csses) {
+window.inlineCSSCache = function(options) {
+  var csses = options.csses;
+  var cookieLimit = options.cookieLimit || 4000;
   var doc = document;
   var head = document.head;
   var hasRestoreFailed = false; // 是否存在缓存恢复失败的情况
@@ -31,7 +35,7 @@ window.inlineCSSCache = function(csses) {
   var changeCookie = function(key, isDelete) {
     var matchedIndex;
     for (var index = 0; index < cssCookieArray.length; index++) {
-      if (name === cssCookieArray[index]) {
+      if (key === cssCookieArray[index]) {
         matchedIndex = index;
         break;
       }
@@ -123,7 +127,7 @@ window.inlineCSSCache = function(csses) {
         return !!key;
       })
       .reduce(function(rcc, key) {
-        if (rcc.length > 4000 || (rcc + key).length > 3999) {
+        if (rcc.length > cookieLimit || (rcc + key).length > cookieLimit) {
           localStorage.removeItem(cssCachePrefix + key);
           return rcc;
         }
@@ -133,7 +137,7 @@ window.inlineCSSCache = function(csses) {
         return rcc + key;
       }, '');
     var cssCookieExpired = 'expires=Fri, 31 Dec 9999 23:59:59 GMT';
-    doc.cookie = cssCookieKey + '=' + cssCookieValue + ';' + cssCookieExpired;
+    doc.cookie = cssCookieKey + '=' + cssCookieValue + ';' + cssCookieExpired + ';path=/';
   } catch (error) {
     console.error(error);
   }
