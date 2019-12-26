@@ -1,0 +1,28 @@
+{
+  "name": "inline-css-cache",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel ./src -d ./lib && terser -c -m -o ./dist/client.js ./lib/client.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhbhun/inline-css-cache.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhbhun/inline-css-cache/issues"
+  },
+  "homepage": "https://github.com/zhbhun/inline-css-cache#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "eslint": "^6.8.0",
+    "prettier": "^1.19.1",
+    "terser": "^4.4.3"
+  }
+}

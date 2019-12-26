@@ -1,0 +1,13 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "spec": false,
+        "loose": false,
+        "useBuiltIns": false
+      }
+    ]
+  ],
+  "sourceType": "script"
+}
