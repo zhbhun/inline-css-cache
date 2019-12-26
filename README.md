@@ -34,3 +34,7 @@ HTML 中使用 `window.inlineCSSCache([{k,n,s}])` 插入内联样式，k 是样�
 </body>
 </html>
 ```
+
+## 原理
+
+![inline-css-cache.jpg](./doc/inline-css-cache.jpg)
