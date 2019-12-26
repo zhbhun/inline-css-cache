@@ -46,7 +46,7 @@ window.inlineCSSCache = function(options) {
   var cssNames;
   try {
     cssNames = JSON.parse(localStorage.getItem(cssNameCache));
-    if (cssNames === null || typeof cssNames !== 'object') {
+    if (!cssNames) {
       cssNames = {};
     }
   } catch (error) {
