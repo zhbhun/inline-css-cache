@@ -1,8 +1,12 @@
 {
   "name": "inline-css-cache",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "./lib/index.js",
+  "files": [
+    "dist",
+    "lib"
+  ],
   "scripts": {
     "build": "babel ./src -d ./lib && terser -c -m -o ./dist/client.js ./lib/client.js"
   },
