@@ -20,31 +20,72 @@ window.inlineCSSCache = function(options) {
   var hasRestoreFailed = false; // 是否存在缓存恢复失败的情况
 
   /**
-   * Cookie 维护
+   * css 缓存的 cookie 名称，存储已经缓存了的样式 key 值，以逗号隔开
    *
    * key1,key2
    */
-  var cssCookieKey = 'csses';
+  var cssCookieName = 'csses';
+  /**
+   * css 缓存样式的标识存储 key 值，key 是缓存样式的 key 值，value 是缓存样式的标志名称
+   * 
+   * { [stringg key]: name }
+   */
+  var cssNameCache = 'csses';
+  /**
+   * css 缓存样式的源码存储 key 值前缀
+   */
   var cssCachePrefix = 'css.';
+  /**
+   * 由于存储空间不足被清除的样式缓存，key 值是缓存样式的 key 值，value 是缓存样式对象 CSSCache
+   * 
+   * { [stringg key]: CSSCache }
+   */
   var cssDeletedCache = {};
-  var cssCookie = getCookieItem(cssCookieKey);
+  var cssCookie = getCookieItem(cssCookieName);
   var cssCookieArray = cssCookie.split(',');
+  var cssNames;
+  try {
+    cssNames = JSON.parse(localStorage.getItem(cssNameCache));
+    if (cssNames === null || typeof cssNames !== 'object') {
+      cssNames = {};
+    }
+  } catch (error) {
+    cssNames = {};
+  }
+  var deleteCSSNameCache = function(key) {
+    if (cssNames[key]) {
+      cssNames[key] = undefined;
+      delete cssNames[key]; 
+    }
+  }
   /**
    * 添加缓存 cookie，先删除旧的，再往缓存头里插入新的 key 值
+   * @param {CSSCache} css
+   * @param {boolean} isDelete
    */
-  var changeCookie = function(key, isDelete) {
-    var matchedIndex;
-    for (var index = 0; index < cssCookieArray.length; index++) {
-      if (key === cssCookieArray[index]) {
-        matchedIndex = index;
+  var changeCookie = function(css, isDelete) {
+    var cssKey = css.k;
+    var cssName = css.n;
+    var deletedKeys = [cssKey];
+    Object.keys(cssNames).forEach(function (key) {
+      if (cssName === cssNames[key]) {
+        deletedKeys.push(key);
+        deleteCSSNameCache(key);
+      }
+    });
+    for (var i = cssCookieArray.length - 1; i >= 0; i--) {
+      var key = cssCookieArray[i];
+      if (deletedKeys.indexOf(key) >= 0) {
+        cssCookieArray.splice(i, 1);
+        if (key !== cssKey || isDelete === true) {
+          localStorage.removeItem(cssCachePrefix + key);
+        }
         break;
       }
     }
-    if (matchedIndex >= 0) {
-      cssCookieArray.splice(matchedIndex, 1);
-    }
     if (isDelete !== true) {
-      cssCookieArray.unshift(key);
+      cssNames[cssKey] = cssName;
+      cssCookieArray.unshift(cssKey);
     }
   };
   /**
@@ -57,6 +98,7 @@ window.inlineCSSCache = function(options) {
       var cssKey = deleted[index];
       var cssCacheKey = cssCachePrefix + cssKey;
       cssDeletedCache[cssKey] = localStorage.getItem(cssCacheKey);
+      deleteCSSNameCache(cssKey);
       localStorage.removeItem(cssCacheKey);
     }
   };
@@ -70,7 +112,7 @@ window.inlineCSSCache = function(options) {
       var cssCacheKey = cssCachePrefix + cssKey;
       try {
         localStorage.setItem(cssCacheKey, JSON.stringify(css));
-        changeCookie(cssKey);
+        changeCookie(css);
       } catch (error) {
         console.error(error);
         if (clear !== false) {
@@ -97,11 +139,11 @@ window.inlineCSSCache = function(options) {
         addCache(css); // 重新加回去
       } else {
         cssSource = JSON.parse(localStorage.getItem(cssCacheKey)).s;
-        changeCookie(css.k);
+        changeCookie(css);
       }
     } catch (error) {
       console.error(error);
-      changeCookie(cssKey, true); // 删除
+      changeCookie(css, true); // 删除
       hasRestoreFailed = true;
     }
     return cssSource;
@@ -129,6 +171,7 @@ window.inlineCSSCache = function(options) {
       .reduce(function(rcc, key) {
         if (rcc.length > cookieLimit || (rcc + key).length > cookieLimit) {
           localStorage.removeItem(cssCachePrefix + key);
+          deleteCSSNameCache(key);
           return rcc;
         }
         if (rcc) {
@@ -136,8 +179,14 @@ window.inlineCSSCache = function(options) {
         }
         return rcc + key;
       }, '');
+    try {
+      localStorage.setItem(cssNameCache, JSON.stringify(cssNames));
+    } catch (error) {
+      localStorage.clear();
+      cssCookieValue = '';
+    }
     var cssCookieExpired = 'expires=Fri, 31 Dec 9999 23:59:59 GMT';
-    doc.cookie = cssCookieKey + '=' + cssCookieValue + ';' + cssCookieExpired + ';path=/';
+    doc.cookie = cssCookieName + '=' + cssCookieValue + ';' + cssCookieExpired + ';path=/';
   } catch (error) {
     console.error(error);
   }
